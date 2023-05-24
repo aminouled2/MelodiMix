@@ -1,0 +1,14 @@
+{
+  "name": "melodimix",
+  "version": "1.0.0",
+  "description": "An automatic playlist generator",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Amin Ouled",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.2.3"
+  }
+}
