@@ -1,0 +1,14 @@
+h1 {
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-image: radial-gradient(circle at left top, rgb(42, 54, 65) -10%, rgb(24, 25, 26) 35%);
+}
+
+input {
+    padding: 20px !important;
+    width: 100%;
+    border-radius: 20px;
+    background-color: rgb(58, 59, 60);
+}

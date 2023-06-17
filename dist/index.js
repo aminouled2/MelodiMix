@@ -9,9 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const { execSync } = require('child_process');
 const express = require('express');
+const path = require('path');
 const auth = require('./auth/auth');
 const app = express();
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '..', 'pages'));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 const PORT = 3000;
+// routing
+app.get('/', (req, res) => {
+    // Example data to pass to the template
+    const user = {
+        name: 'John Doe',
+        age: 30
+    };
+    // Render the 'home' template with the provided data
+    res.render('home', { user });
+});
+// authentication endpoints start
 app.get('/login', (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const authorizationUrl = yield auth.getAuthorizationUrl();
@@ -45,6 +60,7 @@ app.get('/spotify_auth_callback', (req, res) => __awaiter(this, void 0, void 0, 
         res.status(500).send('Authorization Error');
     }
 }));
+//authentication endpoints end
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
