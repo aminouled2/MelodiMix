@@ -4,11 +4,32 @@ const path = require('path');
 const auth = require('./auth/auth')
 const app = express();
 
+// importing custom modules
+import { storeToken } from './functions/storeToken';
+
+let user_tokens : Object;
+
+import * as fs from 'fs'
+
+// first read file, then watch that file for changes
+
+fs.readFile(path.join(__dirname, '..', 'db', 'userTokens.json'), 'utf-8', (_, data : Object) => {
+  user_tokens = data;
+})
+
+fs.watchFile(path.join(__dirname, '..', 'db', 'userTokens.json'), () => {
+  fs.readFile(path.join(__dirname, '..', 'db', 'userTokens.json'), 'utf-8', (_, data : Object) => {
+    user_tokens = data;
+  })
+})
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'pages'));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const PORT = 3000;
+
+
 
 // routing
 
@@ -30,7 +51,6 @@ app.get('/login', async (req, res) => {
     const authorizationUrl = await auth.getAuthorizationUrl();
     res.redirect(authorizationUrl);
   } catch (error) {
-    // Handle any errors that occur during authorization URL retrieval
     console.error('Error retrieving authorization URL:', error);
     res.status(500).send('Internal Server Error');
   }
@@ -52,7 +72,11 @@ app.get('/spotify_auth_callback', async (req, res) => {
     // Retrieve user email
     const userEmail = await auth.getUserEmail(accessToken);
 
-    console.log(userEmail);
+    storeToken(userEmail, accessToken).then(msg => {
+      console.log(msg)
+    }).catch(err => {
+      console.log("it failed!! reason was", err)
+    })
 
     // Redirect to a success page or perform further actions
     res.status(200).send('Authorization Successful');
@@ -68,13 +92,11 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-/*
-save it for later
 
+const arg = "hello"
 try {
-  const javaOutput : string = execSync('java src.main.java.Main').toString().trim();
+  const javaOutput : string = execSync(`java src.main.java.Main ${arg}`).toString().trim();
   console.log('Java output:', javaOutput);
 } catch (error) {
   console.error('Java program execution failed:', error);
 }
-*/
