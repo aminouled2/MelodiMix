@@ -3,7 +3,7 @@ h1 {
 }
 
 body {
-    background-image: radial-gradient(circle at left top, rgb(39 133 143) -10%, rgb(24, 25, 26) 35%)
+    background-image: radial-gradient(circle at left top, rgb(39 133 143) -10%, rgb(24, 25, 26) 35%, rgb(117 16 14) 100%);
 }
 
 input {
