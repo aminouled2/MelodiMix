@@ -13,20 +13,13 @@ const { execSync } = require('child_process');
 const express = require('express');
 const path = require('path');
 const auth = require('./auth/auth');
+const bodyParser = require('body-parser');
 const app = express();
+app.use(bodyParser.json());
 // importing custom modules
 const storeToken_1 = require("./functions/storeToken");
-let user_tokens;
-const fs = require("fs");
-// first read file, then watch that file for changes
-fs.readFile(path.join(__dirname, '..', 'db', 'userTokens.json'), 'utf-8', (_, data) => {
-    user_tokens = data;
-});
-fs.watchFile(path.join(__dirname, '..', 'db', 'userTokens.json'), () => {
-    fs.readFile(path.join(__dirname, '..', 'db', 'userTokens.json'), 'utf-8', (_, data) => {
-        user_tokens = data;
-    });
-});
+const spotifyUtils_1 = require("./functions/spotifyUtils");
+const axios_1 = require("axios");
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'pages'));
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -64,10 +57,12 @@ app.get('/spotify_auth_callback', (req, res) => __awaiter(void 0, void 0, void 0
         const accessToken = yield auth.requestAccessToken(code);
         // Retrieve user email
         const userEmail = yield auth.getUserEmail(accessToken);
-        (0, storeToken_1.storeToken)(userEmail, accessToken).then(msg => {
+        // Retrieve user ID
+        const userId = yield getUserId(accessToken);
+        (0, storeToken_1.storeToken)(userEmail, accessToken, userId).then(msg => {
             console.log(msg);
         }).catch(err => {
-            console.log("it failed!! reason was", err);
+            console.log("It failed!! Reason was", err);
         });
         // Redirect to a success page or perform further actions
         res.status(200).send('Authorization Successful');
@@ -78,15 +73,40 @@ app.get('/spotify_auth_callback', (req, res) => __awaiter(void 0, void 0, void 0
         res.status(500).send('Authorization Error');
     }
 }));
+function getUserId(accessToken) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        };
+        const response = yield axios_1.default.get('https://api.spotify.com/v1/me', config);
+        const userId = response.data.id;
+        return userId;
+    });
+}
 //authentication endpoints end
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-const arg = "hello";
-try {
-    const javaOutput = execSync(`java src.main.java.Main ${arg}`).toString().trim();
-    console.log('Java output:', javaOutput);
-}
-catch (error) {
-    console.error('Java program execution failed:', error);
-}
+app.post('/recommend_songs', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("oh hi");
+    const { query, email } = req.body;
+    (0, storeToken_1.fetchToken)(email).then((token) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("found token ", token);
+        try {
+            const javaOutput = execSync(`java -cp src main.java.Main ${token} ${query}`).toString().trim();
+            const playlistSongs = yield (0, spotifyUtils_1.processPlaylists)(JSON.parse(javaOutput), token);
+            const trackUris = playlistSongs.map((song) => song.uri);
+            (0, storeToken_1.fetchUserId)(email).then((userId) => __awaiter(void 0, void 0, void 0, function* () {
+                const playlistId = yield (0, spotifyUtils_1.createPlaylist)("Sad", token, userId, trackUris);
+                console.log("Playlist created with ID:", playlistId);
+            }));
+        }
+        catch (error) {
+            console.error('Java program execution failed:', error);
+        }
+    })).catch(e => {
+        console.log("failed to fetch token, error is ", e);
+    });
+}));
