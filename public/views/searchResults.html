@@ -1,0 +1,41 @@
+<div class="flex items-center justify-center h-screen bg-center w-max" id="content">
+    <div class="text-center w-screen pt-28">
+        <h1 class="text-6xl text-white font-normal mb-5">MelodiMix</h1>
+
+        <input type="text" id="playlistName" placeholder="Name this playlist" class="text-white w-60 text-center pt-20 mb-10">
+
+        <div class="flex justify-center gap-5 px-5 flex-wrap">
+            <div id="song_preview_template" class="song_template grid gap-4 items-center relative max-w-max" style="display: none;">
+                <div class="overflow-hidden absolute inset-0 rounded-2xl">
+                    <img id="backgroundImg" src="https://i.scdn.co/image/ab67616d0000b273d84a9bbcba91cb6a4a212b1b"
+                        class="coverBG object-cover transform scale-150" style="filter: blur(35px) brightness(60%); opacity: 0;" />
+                </div>
+                <div
+                    style="z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
+                    <img id="cover_main" src="https://i.scdn.co/image/ab67616d0000b273d84a9bbcba91cb6a4a212b1b"
+                        class="cover w-36 self-center rounded-xl" />
+                    <div class="flex flex-col justify-center">
+                        <h2 class="text-white text-xl" id="song_name">D.Y.T (Do Your Thing)</h2>
+                        <p class="text-white" id="artist_name">NVDES</p>
+                    </div>
+
+                    <div class="flex gap-5">
+                        <div class="actionButton" id="playButton">
+                            <span class="material-icons-round">play_arrow</span>
+                            <audio></audio>
+                        </div>
+                          
+                        <div class="actionButton" id="removeButton">
+                            <span class="material-icons-round">delete</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-5 align-middle justify-center">
+            <button onclick="navigateToPage('back')" class="addButton self-center w-60 mt-10 mb-20">Go back</button>
+            <button onclick="savePlaylist(document.getElementById('playlistName').value)" class="addButton self-center w-60 mt-10 mb-20">Add to Spotify</button>
+        </div>
+    </div>
+</div>
