@@ -48,35 +48,14 @@ app.get('/spotify_auth_callback', async (req, res) => {
     return res.status(500).send('Authorization Error');
   }
 
-  try {
-    // Exchange authorization code for access token
-    const accessToken = await auth.requestAccessToken(code);
-
-    // Retrieve user email
-    const userEmail = await auth.getUserEmail(accessToken);
-
-    // Retrieve user ID
-    const userId = await getUserId(accessToken);
-
-    storeToken(userEmail, accessToken, userId).then(msg => {
-      res.cookie('email', userEmail, {
-        maxAge: 3600000, // spotify tokens run out after an hour
-        httpOnly: true
-      });
-
-      res.redirect('/')
-    }).catch(err => {
-      console.log("It failed!! Reason was", err);
-    });
-
-    // Redirect to a success page or perform further actions
-
-  } catch (error) {
-    // Handle any errors that occur during authorization
-    console.error('Authorization error:', error);
-    res.status(500).send('Authorization Error');
-  }
+  logEmail(code) // just to test if the authentication was a success
 });
+
+async function logEmail(code) {
+  // test case
+  // Exchange authorization code for access token
+  const accessToken = await auth.requestAccessToken(code);
+
 
 async function getUserId(accessToken) {
   const config = {
