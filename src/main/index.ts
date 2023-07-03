@@ -3,9 +3,12 @@ const express = require('express');
 const path = require('path');
 const auth = require('./auth/auth')
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser')
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cookieParser());
+
 
 // importing custom modules
 import { storeToken, fetchToken, fetchUserId } from './functions/storeToken';
@@ -22,27 +25,18 @@ const PORT = 3000;
 
 // routing
 
-app.get('/', (req, res) => {
-  // Example data to pass to the template
-  const user = {
-    name: 'John Doe',
-    age: 30
-  };
-
-  // Render the 'home' template with the provided data
-  res.render('home', { user });
-});
-
-
-// authentication endpoints start
-app.get('/login', async (req, res) => {
-  try {
-    const authorizationUrl = await auth.getAuthorizationUrl();
-    res.redirect(authorizationUrl);
-  } catch (error) {
-    console.error('Error retrieving authorization URL:', error);
-    res.status(500).send('Internal Server Error');
+app.get('/', async (req, res) => {
+  const email = req.cookies.email;
+  if (!email) {
+    try {
+      const authorizationUrl = await auth.getAuthorizationUrl();
+      res.redirect(authorizationUrl);
+    } catch (error) {
+      console.error('Error retrieving authorization URL:', error);
+      res.status(500).send('Internal Server Error');
+    }
   }
+  res.render('home', { email });
 });
 
 app.get('/spotify_auth_callback', async (req, res) => {
@@ -65,13 +59,18 @@ app.get('/spotify_auth_callback', async (req, res) => {
     const userId = await getUserId(accessToken);
 
     storeToken(userEmail, accessToken, userId).then(msg => {
-      console.log(msg);
+      res.cookie('email', userEmail, {
+        maxAge: 3600000, // spotify tokens run out after an hour
+        httpOnly: true
+      });
+
+      res.redirect('/')
     }).catch(err => {
       console.log("It failed!! Reason was", err);
     });
 
     // Redirect to a success page or perform further actions
-    res.status(200).send('Authorization Successful');
+
   } catch (error) {
     // Handle any errors that occur during authorization
     console.error('Authorization error:', error);
@@ -99,19 +98,15 @@ app.listen(PORT, () => {
 
 
 app.post('/recommend_songs', async (req, res) => {
-  console.log("oh hi")
   const { query, email } = req.body;
 
   fetchToken(email).then(async token => {
-    console.log("found token ", token)
     try {
       const javaOutput: string = execSync(`java -cp src main.java.Main ${token} ${query}`).toString().trim();
-      const playlistSongs = await processPlaylists(JSON.parse(javaOutput), token);
-      const trackUris = playlistSongs.map((song: any) => song.uri);
-      fetchUserId(email).then(async userId => {
-        const playlistId = await createPlaylist("Happy", token, userId, trackUris);
-        console.log("Playlist created with ID:", playlistId);
+      processPlaylists(JSON.parse(javaOutput), token).then(playlistSongs => {
+        res.status(200).send(playlistSongs)
       })
+
     } catch (error) {
       console.error('Java program execution failed:', error);
     }
@@ -119,3 +114,22 @@ app.post('/recommend_songs', async (req, res) => {
     console.log("failed to fetch token, error is ", e);
   })
 })
+
+app.post('/save_playlist', async (req, res) => {
+  const { playlistSongs, email, title } = req.body;
+  console.log(playlistSongs);
+  
+  const trackUris = Object.values(playlistSongs)
+    .filter((song:any) => song?.uri !== null)
+    .map((song:any) => song?.uri);
+  
+  fetchToken(email).then((token) => {
+    fetchUserId(email).then(async (userId) => {
+      const playlistId = await createPlaylist(title, token, userId, trackUris);
+      console.log("Playlist created with ID:", playlistId);
+    });
+  });
+});
+
+
+

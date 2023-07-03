@@ -19,16 +19,83 @@
     <title>MelodiMix - Home</title>
 </head>
 
+<script>
+    var email = `<%- JSON.stringify(email) %>`;
+    email = JSON.parse(email)
+</script>
+
+
 <body>
-    <div class="flex justify-center items-center h-screen w-screen">
+    <div class="flex justify-center items-center h-screen w-screen selectionContainer" id="selectionContainer">
         <div class="bg-center space-y-10" style="width: 80%;">
             <h1 class="font-normal text-6xl text-white text-center">MelodiMix</h1>
-
-            <input type="text" placeholder="What are you up to?" class="text-white">
+            <input type="text" id='activityDescription' placeholder="What are you up to?" class="text-white">
 
             <h3 class="font-normal text-2xl text-white">I'm feeling...</h3>
 
+            <div class="flex justify-center gap-5 flex-wrap">
+                <div class="feelingButton" style="background: linear-gradient(143deg, #FCD8A3 0%, #FFA114 100%);"
+                    data-feeling="happy">
+                    <h4>Happy</h4>
+                </div>
+
+                <div class="feelingButton" style="background: linear-gradient(143deg, #41159D 0%, #153075 100%);"
+                    data-feeling="sad">
+                    <h4>Sad</h4>
+                </div>
+
+                <div class="feelingButton" style="background: linear-gradient(143deg, #FCA3A3 0%, #971A38 100%);"
+                    data-feeling="angry">
+                    <h4>Angry</h4>
+                </div>
+
+                <div class="feelingButton"
+                    style="background: linear-gradient(143deg, #85D8E6 0%, #48C1E3 50%, #168AAD 100%);"
+                    data-feeling="chilled">
+                    <h4>Chilled</h4>
+                </div>
+
+                <div class="feelingButton"
+                    style="background: linear-gradient(143deg, #FFB6C1 0%, #FF8C94 50%, #FF5A67 100%);"
+                    data-feeling="esthetic">
+                    <h4>Esthetic</h4>
+                </div>
+
+                <div class="feelingButton"
+                    style="background: linear-gradient(143deg, #FCE303 0%, #FFB700 50%, #FF8300 100%);"
+                    data-feeling="energized">
+                    <h4>Energized</h4>
+                </div>
+
+                <div class="feelingButton" style="background: linear-gradient(143deg, #E5A3FC 0%, #971A38 100%);"
+                    data-feeling="romantic">
+                    <h4>Romantic</h4>
+                </div>
+
+                <div class="feelingButton"
+                    style="background: linear-gradient(30deg, #FFD700 0%, #FF8C00 50%, #FF4500 100%);"
+                    data-feeling="inspired">
+                    <h4>Inspired</h4>
+                </div>
+
+                <div class="feelingButton"
+                    style="background: linear-gradient(270deg, #FF4081 0%, #F50057 50%, #D500F9 100%);"
+                    data-feeling="excited">
+                    <h4>Excited</h4>
+                </div>
+
+                <div class="feelingButton"
+                    style="background: linear-gradient(120deg, #FFD54F 0%, #FFAB00 50%, #FF6D00 100%);"
+                    data-feeling="confident">
+                    <h4>Confident</h4>
+                </div>
+
+
+            </div>
         </div>
+    </div>
+
+    <div class="newUI opacity-0 flex justify-center items-center h-screen w-screen" style="width: 100%; display: none;">
     </div>
 
 </body>

@@ -47,12 +47,12 @@ function processPlaylists(response, authToken) {
         let totalTracks = 0;
         for (const playlist of playlists) {
             const tracks = yield getPlaylistTracks(playlist.id, authToken);
-            if (tracks.length + totalTracks <= 50) {
+            if (tracks.length + totalTracks <= 25) {
                 playlistSongs = playlistSongs.concat(tracks);
                 totalTracks += tracks.length;
             }
             else {
-                const remainingTracks = 50 - totalTracks;
+                const remainingTracks = 25 - totalTracks;
                 playlistSongs = playlistSongs.concat(tracks.slice(0, remainingTracks));
                 break;
             }
@@ -72,7 +72,6 @@ function createPlaylist(playlistName, authToken, userId, trackUris) {
         const requestData = {
             name: playlistName,
             public: false,
-            collaborative: false,
             description: 'Created with MelodiMix',
         };
         const response = yield axios_1.default.post(`https://api.spotify.com/v1/users/${userId}/playlists`, requestData, config);

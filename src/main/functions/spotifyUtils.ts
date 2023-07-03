@@ -42,11 +42,11 @@ export async function processPlaylists(response: any, authToken: string): Promis
     for (const playlist of playlists) {
         const tracks = await getPlaylistTracks(playlist.id, authToken);
 
-        if (tracks.length + totalTracks <= 50) {
+        if (tracks.length + totalTracks <= 25) {
             playlistSongs = playlistSongs.concat(tracks);
             totalTracks += tracks.length;
         } else {
-            const remainingTracks = 50 - totalTracks;
+            const remainingTracks = 25 - totalTracks;
             playlistSongs = playlistSongs.concat(tracks.slice(0, remainingTracks));
             break;
         }

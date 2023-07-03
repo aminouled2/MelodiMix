@@ -2,9 +2,13 @@ h1 {
     font-family: 'Outfit', sans-serif;
 }
 
+/* radial-gradient(circle at left top, rgb(39, 143, 114) -10%,  35%, rgb(117 16 14) 100%); */
+
 body {
-    background-image: radial-gradient(circle at left top, rgb(39 133 143) -10%, rgb(24, 25, 26) 35%, rgb(117 16 14) 100%);
+    background-image: radial-gradient(circle at left top, rgb(24, 25, 26) 0%,  rgb(24, 25, 26) 35%); 
+    transition: all 2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
 
 input {
     padding: 20px !important;
@@ -12,6 +16,8 @@ input {
     border-radius: 20px;
     background-color: rgba(58, 59, 60, .3);
     transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    box-shadow: none;
 }
 
 input:hover {
@@ -23,5 +29,152 @@ input:hover {
 input:active {
     background-color: rgba(58, 59, 60, .7);
     transform: scale(0.98);
+    box-shadow: none;
+}
+
+.feelingButton {
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 30px 40px;
+    width: 170px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Outfit' sans-serif;
+    color: white;
+    border-radius: 20px;
+    font-size: 30px;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.feelingButton h4 {
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+
+.feelingButton:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.07);
+}
+
+.feelingButton:hover h4 {
+    transform: scale(1.2);
+    cursor: pointer;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.2);
+}
+
+.feelingButton:active h4 {
+    transform: scale(0.8);
+    cursor: pointer;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0);
+}
+
+.feelingButton:active {
+    transform: scale(0.9);
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0);
+}
+
+
+.selectionContainer {
+    transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.newUI {
+    transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateX(10%);
+    filter: blur(10px)
+}
+
+.hiddenPage {
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: none;
+}
+
+.coverBG {
+    transition: all .7s ease-in-out;
+    transform: scale(1) !important;
+}
+
+
+.song_template {
+    padding: 20px;
+    border-radius: 20px;
+    background-color: rgba(58, 59, 60, .3);
+    transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.song_template:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.2);
+}
+
+.song_template:hover .coverBG{
+    opacity: 1 !important;  
+}
+
+.actionButton {
+    padding: 10px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.actionButton span {
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.actionButton:hover span{
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+.actionButton:active span{
+    transform: scale(0.8);
+    cursor: pointer;
+}
+.actionButton:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.2);
+}
+
+.actionButton:active {
+    transform: scale(0.8);
+    cursor: pointer;
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0);
+}
+
+.addButton {
+    padding: 20px;
+    width: 200px;
+    border-radius: 20px;
+    background-color: rgba(58, 59, 60, .3);
+    font-size: 20px;
+    color: white;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.addButton:hover {
+    transform: scale(1.1);
+    background-color: rgba(58, 59, 60, .7);
+    cursor: pointer;
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.2);
+}
+
+
+.addButton:active {
+    transform: scale(0.8);
+    cursor: pointer;
     box-shadow: 0 2px 18px rgba(0, 0, 0, 0);
 }
