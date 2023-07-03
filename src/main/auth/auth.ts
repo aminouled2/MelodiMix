@@ -3,7 +3,6 @@ dotenv.config();
 const axios = require('axios');
 const querystring = require('querystring');
 
-console.log(process.env.CLIENT_ID);
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 const REDIRECT_URI = 'http://localhost:3000/spotify_auth_callback'; // Replace with your actual redirect URI
@@ -13,7 +12,7 @@ export async function getAuthorizationUrl(): Promise<string> {
     client_id: CLIENT_ID,
     response_type: 'code',
     redirect_uri: REDIRECT_URI,
-    scope: 'user-read-private user-read-email playlist-modify-public', // Add any additional scopes you require
+    scope: 'user-read-private user-read-email playlist-modify-public playlist-modify-private playlist-read-private'
   });
 
   return `https://accounts.spotify.com/authorize?${queryParams}`;

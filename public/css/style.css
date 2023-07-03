@@ -3,12 +3,25 @@ h1 {
 }
 
 body {
-    background-image: radial-gradient(circle at left top, rgb(42, 54, 65) -10%, rgb(24, 25, 26) 35%);
+    background-image: radial-gradient(circle at left top, rgb(39 133 143) -10%, rgb(24, 25, 26) 35%, rgb(117 16 14) 100%);
 }
 
 input {
     padding: 20px !important;
     width: 100%;
     border-radius: 20px;
-    background-color: rgb(58, 59, 60);
+    background-color: rgba(58, 59, 60, .3);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+input:hover {
+    background-color: rgba(58, 59, 60, .7);
+    transform: scale(1.01);
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.07);
+}
+
+input:active {
+    background-color: rgba(58, 59, 60, .7);
+    transform: scale(0.98);
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0);
 }
