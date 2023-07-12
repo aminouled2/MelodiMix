@@ -9,8 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPlaylist = exports.processPlaylists = exports.getPlaylistTracks = void 0;
+exports.createPlaylist = exports.processPlaylists = exports.getPlaylistTracks = exports.fetchPlaylists = void 0;
 const axios_1 = require("axios");
+function fetchPlaylists(mood, authToken) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+            },
+        };
+        const response = yield axios_1.default.get(`https://api.spotify.com/v1/search?q=${mood}&type=playlist`, config);
+        return response.data;
+    });
+}
+exports.fetchPlaylists = fetchPlaylists;
 function getPlaylistTracks(playlistId, authToken) {
     return __awaiter(this, void 0, void 0, function* () {
         const config = {
@@ -22,7 +34,10 @@ function getPlaylistTracks(playlistId, authToken) {
         if (!response.data.items) {
             return []; // Return an empty array if there are no tracks
         }
-        const tracks = response.data.items.map((item) => {
+        const tracks = response.data.items
+            .filter((item) => item.track && item.track.type === 'track') // Filter out albums
+            .map((item) => {
+            var _a;
             const artists = item.track.artists.map((artist) => artist.name);
             const artistString = artists.length > 1 ? artists.slice(0, -1).join(', ') + ' and ' + artists.slice(-1) : artists[0];
             return {
@@ -30,7 +45,7 @@ function getPlaylistTracks(playlistId, authToken) {
                 uri: item.track.uri,
                 albumName: item.track.album.name,
                 href: item.track.external_urls.spotify,
-                image: item.track.album.images[0].url,
+                image: (_a = item.track.album.images[0]) === null || _a === void 0 ? void 0 : _a.url,
                 popularity: item.track.album.popularity,
                 preview: item.track.preview_url,
                 artists: artistString
@@ -43,17 +58,23 @@ exports.getPlaylistTracks = getPlaylistTracks;
 function processPlaylists(response, authToken) {
     return __awaiter(this, void 0, void 0, function* () {
         const playlists = response.playlists.items;
+        const totalSongs = 25;
         let playlistSongs = [];
         let totalTracks = 0;
+        const calculateRemainingTracks = () => totalSongs - totalTracks;
         for (const playlist of playlists) {
             const tracks = yield getPlaylistTracks(playlist.id, authToken);
-            if (tracks.length + totalTracks <= 25) {
+            let remainingTracks = calculateRemainingTracks();
+            if (remainingTracks <= 0) {
+                break;
+            }
+            if (tracks.length <= remainingTracks) {
                 playlistSongs = playlistSongs.concat(tracks);
                 totalTracks += tracks.length;
             }
             else {
-                const remainingTracks = 25 - totalTracks;
                 playlistSongs = playlistSongs.concat(tracks.slice(0, remainingTracks));
+                totalTracks += remainingTracks;
                 break;
             }
         }

@@ -61,24 +61,36 @@ function removeSong(id) {
 }
 
 function togglePlayPause(songPreview, button) {
-  console.log("now playing", songPreview);
   const playPauseButton = button.querySelector('.material-icons-round');
   const audioElement = button.querySelector('audio');
 
-  audioElement.src = songPreview;
-
-  if (audioElement.paused || audioElement.ended) {
-    // Change symbol to "play_arrow"
-    playPauseButton.textContent = 'play_arrow';
-    // Play the audio
+  if (audioElement.paused) {
     audioElement.play();
   } else {
-    // Change symbol to "pause"
-    playPauseButton.textContent = 'pause';
-    // Pause the audio
     audioElement.pause();
   }
+
+  audioElement.addEventListener("play", function() {
+    playPauseButton.textContent = 'pause';
+    muteOtherAudioElements(audioElement);
+  });
+
+  audioElement.addEventListener("pause", function() {
+    playPauseButton.textContent = 'play_arrow';
+  });
+
 }
+
+function muteOtherAudioElements(currentAudioElement) {
+  const allAudioElements = document.querySelectorAll('audio');
+
+  allAudioElements.forEach(function(audioElement) {
+    if (audioElement !== currentAudioElement) {
+      audioElement.pause();
+    }
+  });
+}
+
 
 
 function generatePlaylist(mood) {
@@ -100,7 +112,7 @@ function generatePlaylist(mood) {
     })
     .then(data => {
       data.forEach((object, index) => {
-        duplicateSongPreview(object.albumName, object.track_id, object.artists, object.image, object.preview)
+        duplicateSongPreview(object.albumName, object.track_id, object.artists, object.image, object.preview, object.href)
 
         selectedSongs[object.track_id] = object
       });
@@ -138,7 +150,7 @@ function savePlaylist(title) {
 }
 
 
-function duplicateSongPreview(songName, songId, artistName, coverImageURL, songPreview) {
+function duplicateSongPreview(songName, songId, artistName, coverImageURL, songPreview, href) {
   // Get the template element
   const template = document.getElementById("song_preview_template");
 
@@ -159,6 +171,9 @@ function duplicateSongPreview(songName, songId, artistName, coverImageURL, songP
   // Update the IDs of the cloned elements
   clone.id = songId;
   clone.style.display = "flex"
+  clone.querySelector("#cover_main").onclick = function() {
+    window.open(href)
+  }
   clone.querySelector("#backgroundImg").id = `${uniqueId}_backgroundImg`;
   clone.querySelector("#cover_main").id = `${uniqueId}_cover_main`;
   clone.querySelector("#song_name").id = `${uniqueId}_song_name`;
@@ -186,6 +201,9 @@ function duplicateSongPreview(songName, songId, artistName, coverImageURL, songP
   if (!songPreview) {
     clone.querySelector('#playButton').remove()
   } else {
+
+    clone.querySelector('audio').src = songPreview;
+
     clone.querySelector('#playButton').onclick = function () {
       togglePlayPause(songPreview, clone.querySelector('#playButton'))
     }
@@ -212,9 +230,11 @@ function navigateToPage(page, mood) {
     newUI.style.transform = 'translateX(-10%)';
     newUI.style.filter = 'blur(4px)';
 
+    selectedSongs = {}; // clear out current songs
     setTimeout(() => {
       selectionContainer.style.display = 'none';
       newUI.style.display = 'flex';
+      document.title = "MelodiMix"
     }, 100);
 
     // Show new UI and fade it in
