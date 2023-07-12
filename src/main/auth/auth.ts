@@ -5,7 +5,7 @@ const querystring = require('querystring');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET
-const REDIRECT_URI = 'http://localhost:3000/spotify_auth_callback'; // Replace with your actual redirect URI
+const REDIRECT_URI = 'https://ouled.de/spotify_auth_callback'; // Replace with your actual redirect URI
 
 export async function getAuthorizationUrl(): Promise<string> {
   const queryParams = querystring.stringify({
