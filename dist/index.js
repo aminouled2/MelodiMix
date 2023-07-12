@@ -27,7 +27,7 @@ app.set('views', path.join(__dirname, '..', 'pages'));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 const PORT = 3000;
 // routing
-app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get('/melodimix', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const email = req.cookies.email;
     if (!email) {
         try {
@@ -60,7 +60,7 @@ app.get('/spotify_auth_callback', (req, res) => __awaiter(void 0, void 0, void 0
                 maxAge: 3600000,
                 httpOnly: true
             });
-            res.redirect('/');
+            res.redirect('/melodimix');
         }).catch(err => {
             console.log("It failed!! Reason was", err);
         });
@@ -92,9 +92,11 @@ app.post('/recommend_songs', (req, res) => __awaiter(void 0, void 0, void 0, fun
     const { query, email } = req.body;
     (0, storeToken_1.fetchToken)(email).then((token) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const javaOutput = execSync(`java -cp src main.java.Main ${token} ${query}`).toString().trim();
-            (0, spotifyUtils_1.processPlaylists)(JSON.parse(javaOutput), token).then(playlistSongs => {
-                res.status(200).send(playlistSongs);
+            (0, spotifyUtils_1.fetchPlaylists)(query, token).then(playlistResponse => {
+                console.log(playlistResponse);
+                (0, spotifyUtils_1.processPlaylists)(playlistResponse, token).then(playlistSongs => {
+                    res.status(200).send(playlistSongs);
+                });
             });
         }
         catch (error) {

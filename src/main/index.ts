@@ -12,7 +12,7 @@ app.use(cookieParser());
 
 // importing custom modules
 import { storeToken, fetchToken, fetchUserId } from './functions/storeToken';
-import { processPlaylists, createPlaylist } from './functions/spotifyUtils';
+import { processPlaylists, createPlaylist, fetchPlaylists } from './functions/spotifyUtils';
 import axios from 'axios';
 
 app.set('view engine', 'ejs');
@@ -25,7 +25,7 @@ const PORT = 3000;
 
 // routing
 
-app.get('/', async (req, res) => {
+app.get('/melodimix', async (req, res) => {
   const email = req.cookies.email;
   if (!email) {
     try {
@@ -47,16 +47,29 @@ app.get('/spotify_auth_callback', async (req, res) => {
     console.error('Authorization error:', error);
     return res.status(500).send('Authorization Error');
   }
+  
+  try {
+    // Exchange authorization code for access token
+    const accessToken = await auth.requestAccessToken(code);
 
-  logEmail(code) // just to test if the authentication was a success
+    // Retrieve user email
+    const userEmail = await auth.getUserEmail(accessToken);
+
+    // Retrieve user ID
+    const userId = await getUserId(accessToken);
+
+    storeToken(userEmail, accessToken, userId).then(msg => {
+      res.cookie('email', userEmail, {
+        maxAge: 3600000, // spotify tokens run out after an hour
+        httpOnly: true
+      });
+
+      res.redirect('/melodimix')
+    }).catch(err => {
+      console.log("It failed!! Reason was", err);
+    });
 });
-
-async function logEmail(code) {
-  // test case
-  // Exchange authorization code for access token
-  const accessToken = await auth.requestAccessToken(code);
-
-
+  
 async function getUserId(accessToken) {
   const config = {
     headers: {
@@ -81,11 +94,12 @@ app.post('/recommend_songs', async (req, res) => {
 
   fetchToken(email).then(async token => {
     try {
-      const javaOutput: string = execSync(`java -cp src main.java.Main ${token} ${query}`).toString().trim();
-      processPlaylists(JSON.parse(javaOutput), token).then(playlistSongs => {
-        res.status(200).send(playlistSongs)
+      fetchPlaylists(query, token).then(playlistResponse => {
+        console.log(playlistResponse)
+        processPlaylists(playlistResponse, token).then(playlistSongs => {
+          res.status(200).send(playlistSongs)
+        })
       })
-
     } catch (error) {
       console.error('Java program execution failed:', error);
     }
@@ -97,11 +111,11 @@ app.post('/recommend_songs', async (req, res) => {
 app.post('/save_playlist', async (req, res) => {
   const { playlistSongs, email, title } = req.body;
   console.log(playlistSongs);
-  
+
   const trackUris = Object.values(playlistSongs)
-    .filter((song:any) => song?.uri !== null)
-    .map((song:any) => song?.uri);
-  
+    .filter((song: any) => song?.uri !== null)
+    .map((song: any) => song?.uri);
+
   fetchToken(email).then((token) => {
     fetchUserId(email).then(async (userId) => {
       const playlistId = await createPlaylist(title, token, userId, trackUris);
